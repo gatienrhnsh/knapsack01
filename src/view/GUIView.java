@@ -11,9 +11,12 @@ public class GUIView extends JFrame {
     private final JTable table;
     private final JButton addButton;
     private final JButton removeButton;
-    private final JButton byweight;
-    private final JTextField hasilBarangField;
     private final JTextField constraintField;
+    private final JTextField hasilBarangField;
+    private final JButton byWeightButton;
+    private final JButton byProfitButton;
+    private final JButton byDensityButton;
+    private final JButton bruteForceButton;
 
     public GUIView() {
         setTitle("Table with Add/Remove Rows");
@@ -51,8 +54,17 @@ public class GUIView extends JFrame {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        byweight = new JButton("By Weight");
-        buttonPanel.add(byweight);
+        byWeightButton = new JButton("By Weight");
+        buttonPanel.add(byWeightButton);
+
+        byProfitButton = new JButton("By Profit");
+        buttonPanel.add(byProfitButton);
+
+        byDensityButton = new JButton("By Density");
+        buttonPanel.add(byDensityButton);
+
+        bruteForceButton = new JButton("BruteForce");
+        buttonPanel.add(bruteForceButton);
 
         bottomPanel.add(buttonPanel, BorderLayout.NORTH);
 
@@ -65,7 +77,7 @@ public class GUIView extends JFrame {
         JLabel constraintLabel = new JLabel("Constraint: ");
         textFieldPanelConstraint.add(constraintLabel);
 
-        constraintField = new JTextField(2);
+        constraintField = new JTextField(4);
         textFieldPanelConstraint.add(constraintField);
 
         JLabel constraintTextLabel = new JLabel("kg");
@@ -101,8 +113,20 @@ public class GUIView extends JFrame {
         return removeButton;
     }
 
-    public JButton getbyweight() {
-        return byweight;
+    public JButton getByWeightButton() {
+        return byWeightButton;
+    }
+
+    public JButton getByProfitButton() {
+        return byProfitButton;
+    }
+
+    public JButton getByDensityButton() {
+        return byDensityButton;
+    }
+
+    public JButton getBruteForceButton() {
+        return bruteForceButton;
     }
 
     public JTextField getHasilBarangField() {

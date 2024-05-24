@@ -3,9 +3,9 @@ package controller;
 import model.TableModel;
 import view.GUIView;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -17,7 +17,9 @@ public class TableController {
         this.view = view;
         this.view.getAddButton().addActionListener(new AddButtonListener());
         this.view.getRemoveButton().addActionListener(new RemoveButtonListener());
-        this.view.getbyweight().addActionListener(new ByWeightListener());
+        this.view.getByWeightButton().addActionListener(new ByWeightListener());
+        this.view.getByProfitButton().addActionListener(new ByProfitListener());
+        this.view.getByDensityButton().addActionListener(new ByDensitytListener());
     }
 
     private class AddButtonListener implements ActionListener {
@@ -41,6 +43,20 @@ public class TableController {
         }
     }
 
+    private class ByProfitListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            displayBarangNamesByProfit();
+        }
+    }
+
+    private class ByDensitytListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            displayBarangNamesByDensity();
+        }
+    }
+
     private void addRow() {
         TableModel tableModel = (TableModel) view.getTable().getModel();
         String barang = getNextBarang(tableModel.getRowCount());
@@ -59,38 +75,25 @@ public class TableController {
         return String.valueOf(rowCount + 1);
     }
 
-    private void displayBarangNamesByWeight() {
+    private List<float[]> getDataintolist() {
         List<Object[]> inputData = getInputDataFromTable();
-        System.out.println("Input Data: " + inputData);
-
-        List<int[]> details = new ArrayList<>();
+        List<float[]> details = new ArrayList<>();
         for (int i = 0; i < inputData.size(); i++) {
             Object[] row = inputData.get(i);
             if (row[1] != null && row[2] != null) {
                 try {
-                    int no = i + 1;
-                    int weight = Integer.parseInt(row[1].toString());
-                    int profit = Integer.parseInt(row[2].toString());
-                    details.add(new int[]{no, weight, profit});
+                    float no = i + 1;
+                    float weight = Float.parseFloat(row[1].toString());
+                    float profit = Float.parseFloat(row[2].toString());
+                    float density = profit / weight;
+                    details.add(new float[]{no, weight, profit, density});
                 } catch (NumberFormatException e) {
-                    System.err.println("Invalid number format in row: " + row[0]);
+                    System.err.println("Invalid number in row: " + row[0]);
                 }
             }
         }
-
-        // Sort details based on weight in ascending order
-        details.sort(Comparator.comparingInt(a -> a[1]));
-
-        List<String> barangDetails = new ArrayList<>();
-        for (int[] detail : details) {
-            barangDetails.add("(" + detail[0] + ", " + detail[1] + ", " + detail[2] + ")");
-        }
-        String hasilBarang = String.join(", ", barangDetails);
-        view.getHasilBarangField().setText(hasilBarang);
-
-        System.out.println("Details: " + barangDetails);
+        return details;
     }
-
 
     private List<Object[]> getInputDataFromTable() {
         TableModel tableModel = (TableModel) view.getTable().getModel();
@@ -106,5 +109,67 @@ public class TableController {
             data.add(row);
         }
         return data;
+    }
+
+    private int getConstraintValue() {
+        int constraint = 0;
+        try {
+            constraint = Integer.parseInt(view.getConstraintField().getText());
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid constraint: " + view.getConstraintField().getText());
+        }
+
+        return constraint;
+    }
+
+    private void displayBarangNamesByWeight() {
+        List<float[]> details = getDataintolist();
+        details.sort(Comparator.comparingDouble(a -> a[1]));
+        List<String> namabarang = new ArrayList<>();
+        float constraint = getConstraintValue();
+
+        for (float[] detail : details) {
+            if (constraint >= detail[1]){
+                DecimalFormat df = new DecimalFormat("#");
+                namabarang.add(df.format(detail[0]));
+                constraint -= detail[1];
+            }
+        }
+        String hasilBarang = String.join(", ", namabarang);
+        view.getHasilBarangField().setText(hasilBarang);
+    }
+
+    private void displayBarangNamesByProfit() {
+        List<float[]> details = getDataintolist();
+        details.sort(Comparator.comparingDouble(a -> ((float[])a)[2]).reversed());
+        List<String> namabarang = new ArrayList<>();
+        float constraint = getConstraintValue();
+
+        for (float[] detail : details) {
+            if (constraint >= detail[1]) {
+                DecimalFormat df = new DecimalFormat("#");
+                namabarang.add(df.format(detail[0]));
+                constraint -= detail[1];
+            }
+        }
+        String hasilBarang = String.join(", ", namabarang);
+        view.getHasilBarangField().setText(hasilBarang);
+    }
+
+    private void displayBarangNamesByDensity() {
+        List<float[]> details = getDataintolist();
+        details.sort(Comparator.comparingDouble(a -> ((float[])a)[3]).reversed());
+        List<String> namabarang = new ArrayList<>();
+        float constraint = getConstraintValue();
+
+        for (float[] detail : details) {
+            if (constraint >= detail[1]) {
+                DecimalFormat df = new DecimalFormat("#");
+                namabarang.add(df.format(detail[0]));
+                constraint -= detail[1];
+            }
+        }
+        String hasilBarang = String.join(", ", namabarang);
+        view.getHasilBarangField().setText(hasilBarang);
     }
 }
