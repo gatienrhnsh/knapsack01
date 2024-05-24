@@ -8,12 +8,12 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 
 public class GUIView extends JFrame {
-    private JTable table;
-    private JButton addButton;
-    private JButton removeButton;
-    private JButton byweight;
-    private JTextField hasilBarangField;
-    private JTextField constraintField;
+    private final JTable table;
+    private final JButton addButton;
+    private final JButton removeButton;
+    private final JButton byweight;
+    private final JTextField hasilBarangField;
+    private final JTextField constraintField;
 
     public GUIView() {
         setTitle("Table with Add/Remove Rows");
