@@ -20,6 +20,7 @@ public class TableController {
         this.view.getByWeightButton().addActionListener(new ByWeightListener());
         this.view.getByProfitButton().addActionListener(new ByProfitListener());
         this.view.getByDensityButton().addActionListener(new ByDensitytListener());
+        this.view.getDynamicProgrammingButton().addActionListener(new ByDynamicProgramming());
     }
 
     private class AddButtonListener implements ActionListener {
@@ -55,6 +56,11 @@ public class TableController {
         public void actionPerformed(ActionEvent e) {
             displayBarangNamesByDensity();
         }
+    }
+
+    private class ByDynamicProgramming implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) { displayBarangByDynamicProgramming(); }
     }
 
     private void addRow() {
@@ -122,9 +128,7 @@ public class TableController {
         return constraint;
     }
 
-    private void displayBarangNamesByWeight() {
-        List<float[]> details = getDataintolist();
-        details.sort(Comparator.comparingDouble(a -> a[1]));
+    private String greedyknapsack(List<float[]> details){
         List<String> namabarang = new ArrayList<>();
         float constraint = getConstraintValue();
 
@@ -135,41 +139,105 @@ public class TableController {
                 constraint -= detail[1];
             }
         }
-        String hasilBarang = String.join(", ", namabarang);
+        return String.join(", ", namabarang);
+    }
+
+    private void displayBarangNamesByWeight() {
+        List<float[]> details = getDataintolist();
+        details.sort(Comparator.comparingDouble(a -> a[1]));
+//        List<String> namabarang = new ArrayList<>();
+//        float constraint = getConstraintValue();
+//
+//        for (float[] detail : details) {
+//            if (constraint >= detail[1]){
+//                DecimalFormat df = new DecimalFormat("#");
+//                namabarang.add(df.format(detail[0]));
+//                constraint -= detail[1];
+//            }
+//        }
+//        String hasilBarang = String.join(", ", namabarang);
+        String hasilBarang = greedyknapsack(details);
         view.getHasilBarangField().setText(hasilBarang);
     }
 
     private void displayBarangNamesByProfit() {
         List<float[]> details = getDataintolist();
         details.sort(Comparator.comparingDouble(a -> ((float[])a)[2]).reversed());
-        List<String> namabarang = new ArrayList<>();
-        float constraint = getConstraintValue();
-
-        for (float[] detail : details) {
-            if (constraint >= detail[1]) {
-                DecimalFormat df = new DecimalFormat("#");
-                namabarang.add(df.format(detail[0]));
-                constraint -= detail[1];
-            }
-        }
-        String hasilBarang = String.join(", ", namabarang);
+//        List<String> namabarang = new ArrayList<>();
+//        float constraint = getConstraintValue();
+//
+//        for (float[] detail : details) {
+//            if (constraint >= detail[1]) {
+//                DecimalFormat df = new DecimalFormat("#");
+//                namabarang.add(df.format(detail[0]));
+//                constraint -= detail[1];
+//            }
+//        }
+//        String hasilBarang =
+        String hasilBarang = greedyknapsack(details);
         view.getHasilBarangField().setText(hasilBarang);
     }
 
     private void displayBarangNamesByDensity() {
         List<float[]> details = getDataintolist();
         details.sort(Comparator.comparingDouble(a -> ((float[])a)[3]).reversed());
-        List<String> namabarang = new ArrayList<>();
-        float constraint = getConstraintValue();
-
-        for (float[] detail : details) {
-            if (constraint >= detail[1]) {
-                DecimalFormat df = new DecimalFormat("#");
-                namabarang.add(df.format(detail[0]));
-                constraint -= detail[1];
-            }
-        }
-        String hasilBarang = String.join(", ", namabarang);
+//        List<String> namabarang = new ArrayList<>();
+//        float constraint = getConstraintValue();
+//
+//        for (float[] detail : details) {
+//            if (constraint >= detail[1]) {
+//                DecimalFormat df = new DecimalFormat("#");
+//                namabarang.add(df.format(detail[0]));
+//                constraint -= detail[1];
+//            }
+//        }
+//        String hasilBarang = String.join(", ", namabarang);
+        String hasilBarang = greedyknapsack(details);
         view.getHasilBarangField().setText(hasilBarang);
     }
+
+    private void displayBarangByDynamicProgramming(){
+        List<float[]> details = getDataintolist();
+        int k = getConstraintValue();
+        int n = details.size();
+        float [][] dp = new float[n+1][k+1];
+        boolean [][] keep = new boolean[n+1][k+1];
+
+        int i = 1;
+        for (float[] detail : details){
+            float weight = detail[1];
+            float profit = detail[2];
+
+            for (int w = 0; w <= k; w++) {
+                if (weight <= w) {
+                    if (profit + dp[i - 1][(int)(w - weight)] > dp[i - 1][w]) {
+                        dp[i][w] = profit + dp[i - 1][(int)(w - weight)];
+                        keep[i][w] = true;
+                    } else {
+                        dp[i][w] = dp[i - 1][w];
+                        keep[i][w] = false;
+                    }
+                } else {
+                    dp[i][w] = dp[i - 1][w];
+                    keep[i][w] = false;
+                }
+            }
+            i++;
+        }
+
+        StringBuilder hasilBarang = new StringBuilder();
+        int w = k;
+        for (i = n; i > 0 && w > 0; i--) {
+            if (keep[i][w]) {
+                if (!hasilBarang.isEmpty()) {
+                    hasilBarang.append(", ");
+                }
+                hasilBarang.append((int) details.get(i - 1)[0]); // Add the item number as an integer
+                w -= (int) details.get(i - 1)[1]; // Reduce the weight
+            }
+        }
+
+        view.getHasilBarangField().setText(hasilBarang.toString());
+    }
 }
+

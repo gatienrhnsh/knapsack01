@@ -16,7 +16,7 @@ public class GUIView extends JFrame {
     private final JButton byWeightButton;
     private final JButton byProfitButton;
     private final JButton byDensityButton;
-    private final JButton bruteForceButton;
+    private final JButton DynamicProgrammingButton;
 
     public GUIView() {
         setTitle("Table with Add/Remove Rows");
@@ -63,8 +63,8 @@ public class GUIView extends JFrame {
         byDensityButton = new JButton("By Density");
         buttonPanel.add(byDensityButton);
 
-        bruteForceButton = new JButton("BruteForce");
-        buttonPanel.add(bruteForceButton);
+        DynamicProgrammingButton = new JButton("Dynamic Programming");
+        buttonPanel.add(DynamicProgrammingButton);
 
         bottomPanel.add(buttonPanel, BorderLayout.NORTH);
 
@@ -125,8 +125,8 @@ public class GUIView extends JFrame {
         return byDensityButton;
     }
 
-    public JButton getBruteForceButton() {
-        return bruteForceButton;
+    public JButton getDynamicProgrammingButton() {
+        return DynamicProgrammingButton;
     }
 
     public JTextField getHasilBarangField() {
