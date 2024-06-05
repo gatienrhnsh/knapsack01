@@ -223,7 +223,7 @@ public class TableController {
                 if (!selectedItems.isEmpty()) {
                     selectedItems.insert(0, ", ");
                 }
-                selectedItems.insert(0, details.get(i - 1)[0]); // Assuming item[0] is the item number
+                selectedItems.insert(0, details.get(i - 1)[0]);
                 w -= details.get(i - 1)[1];
             }
             i--;
