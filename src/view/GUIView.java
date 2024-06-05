@@ -13,13 +13,13 @@ public class GUIView extends JFrame {
     private final JButton removeButton;
     private final JTextField constraintField;
     private final JTextField hasilBarangField;
-    private final JButton byWeightButton;
-    private final JButton byProfitButton;
-    private final JButton byDensityButton;
+    private final JButton BruteForceButton;
+//    private final JButton byProfitButton;
+//    private final JButton byDensityButton;
     private final JButton DynamicProgrammingButton;
 
     public GUIView() {
-        setTitle("Table with Add/Remove Rows");
+        setTitle("Knapsack 0/1");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -54,14 +54,14 @@ public class GUIView extends JFrame {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        byWeightButton = new JButton("By Weight");
-        buttonPanel.add(byWeightButton);
+        BruteForceButton = new JButton("Brute Force");
+        buttonPanel.add(BruteForceButton);
 
-        byProfitButton = new JButton("By Profit");
-        buttonPanel.add(byProfitButton);
-
-        byDensityButton = new JButton("By Density");
-        buttonPanel.add(byDensityButton);
+//        byProfitButton = new JButton("By Profit");
+//        buttonPanel.add(byProfitButton);
+//
+//        byDensityButton = new JButton("By Density");
+//        buttonPanel.add(byDensityButton);
 
         DynamicProgrammingButton = new JButton("Dynamic Programming");
         buttonPanel.add(DynamicProgrammingButton);
@@ -113,17 +113,17 @@ public class GUIView extends JFrame {
         return removeButton;
     }
 
-    public JButton getByWeightButton() {
-        return byWeightButton;
+    public JButton getBruteForceButton() {
+        return BruteForceButton;
     }
 
-    public JButton getByProfitButton() {
-        return byProfitButton;
-    }
-
-    public JButton getByDensityButton() {
-        return byDensityButton;
-    }
+//    public JButton getByProfitButton() {
+//        return byProfitButton;
+//    }
+//
+//    public JButton getByDensityButton() {
+//        return byDensityButton;
+//    }
 
     public JButton getDynamicProgrammingButton() {
         return DynamicProgrammingButton;

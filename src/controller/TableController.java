@@ -3,11 +3,10 @@ package controller;
 import model.TableModel;
 import view.GUIView;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class TableController {
@@ -17,9 +16,9 @@ public class TableController {
         this.view = view;
         this.view.getAddButton().addActionListener(new AddButtonListener());
         this.view.getRemoveButton().addActionListener(new RemoveButtonListener());
-        this.view.getByWeightButton().addActionListener(new ByWeightListener());
-        this.view.getByProfitButton().addActionListener(new ByProfitListener());
-        this.view.getByDensityButton().addActionListener(new ByDensitytListener());
+        this.view.getBruteForceButton().addActionListener(new ByBruteForceListener());
+//        this.view.getByProfitButton().addActionListener(new ByProfitListener());
+//        this.view.getByDensityButton().addActionListener(new ByDensitytListener());
         this.view.getDynamicProgrammingButton().addActionListener(new ByDynamicProgramming());
     }
 
@@ -37,26 +36,26 @@ public class TableController {
         }
     }
 
-    private class ByWeightListener implements ActionListener {
+    private class ByBruteForceListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            displayBarangNamesByWeight();
+            displayBarangByBruteForce();
         }
     }
 
-    private class ByProfitListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            displayBarangNamesByProfit();
-        }
-    }
+//    private class ByProfitListener implements ActionListener {
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            displayBarangNamesByProfit();
+//        }
+//    }
 
-    private class ByDensitytListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            displayBarangNamesByDensity();
-        }
-    }
+//    private class ByDensitytListener implements ActionListener {
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            displayBarangNamesByDensity();
+//        }
+//    }
 
     private class ByDynamicProgramming implements ActionListener {
         @Override
@@ -81,18 +80,48 @@ public class TableController {
         return String.valueOf(rowCount + 1);
     }
 
-    private List<float[]> getDataintolist() {
+    private int getConstraintValue() {
+        int constraint = 0;
+        try {
+            constraint = Integer.parseInt(view.getConstraintField().getText());
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid constraint: " + view.getConstraintField().getText());
+        }
+
+        return constraint;
+    }
+
+//    private List<float[]> getDataintolist() {
+//        List<Object[]> inputData = getInputDataFromTable();
+//        List<float[]> details = new ArrayList<>();
+//        for (int i = 0; i < inputData.size(); i++) {
+//            Object[] row = inputData.get(i);
+//            if (row[1] != null && row[2] != null) {
+//                try {
+//                    float no = i + 1;
+//                    float weight = Float.parseFloat(row[1].toString());
+//                    float profit = Float.parseFloat(row[2].toString());
+//                    float density = profit / weight;
+//                    details.add(new float[]{no, weight, profit, density});
+//                } catch (NumberFormatException e) {
+//                    System.err.println("Invalid number in row: " + row[0]);
+//                }
+//            }
+//        }
+//        return details;
+//    }
+
+    private List<int[]> getDataintolistDP() {
         List<Object[]> inputData = getInputDataFromTable();
-        List<float[]> details = new ArrayList<>();
+        List<int[]> details = new ArrayList<>();
         for (int i = 0; i < inputData.size(); i++) {
             Object[] row = inputData.get(i);
             if (row[1] != null && row[2] != null) {
                 try {
-                    float no = i + 1;
-                    float weight = Float.parseFloat(row[1].toString());
-                    float profit = Float.parseFloat(row[2].toString());
-                    float density = profit / weight;
-                    details.add(new float[]{no, weight, profit, density});
+                    int no = i + 1;
+                    int weight = Integer.parseInt(row[1].toString());
+                    int profit = Integer.parseInt(row[2].toString());
+                    details.add(new int[]{no, weight, profit});
                 } catch (NumberFormatException e) {
                     System.err.println("Invalid number in row: " + row[0]);
                 }
@@ -117,34 +146,7 @@ public class TableController {
         return data;
     }
 
-    private int getConstraintValue() {
-        int constraint = 0;
-        try {
-            constraint = Integer.parseInt(view.getConstraintField().getText());
-        } catch (NumberFormatException e) {
-            System.err.println("Invalid constraint: " + view.getConstraintField().getText());
-        }
-
-        return constraint;
-    }
-
-    private String greedyknapsack(List<float[]> details){
-        List<String> namabarang = new ArrayList<>();
-        float constraint = getConstraintValue();
-
-        for (float[] detail : details) {
-            if (constraint >= detail[1]){
-                DecimalFormat df = new DecimalFormat("#");
-                namabarang.add(df.format(detail[0]));
-                constraint -= detail[1];
-            }
-        }
-        return String.join(", ", namabarang);
-    }
-
-    private void displayBarangNamesByWeight() {
-        List<float[]> details = getDataintolist();
-        details.sort(Comparator.comparingDouble(a -> a[1]));
+//    private String greedyknapsack(List<float[]> details){
 //        List<String> namabarang = new ArrayList<>();
 //        float constraint = getConstraintValue();
 //
@@ -155,89 +157,147 @@ public class TableController {
 //                constraint -= detail[1];
 //            }
 //        }
-//        String hasilBarang = String.join(", ", namabarang);
-        String hasilBarang = greedyknapsack(details);
-        view.getHasilBarangField().setText(hasilBarang);
+//        return String.join(", ", namabarang);
+//    }
+
+    private void displayBarangByBruteForce() {
+        List<int[]> details = getDataintolistDP();
+        int n = details.size();
+        int k = getConstraintValue();
+        int maxProfit = 0;
+        String selectedItems = "";
+
+        long StartTime = System.currentTimeMillis();
+        for (int i = 0; i < (1 << n); i++) {
+            int totalWeight = 0;
+            int totalProfit = 0;
+            StringBuilder currentItem = new StringBuilder();
+
+            System.out.print("Subset " + (i + 1) + ": ");
+
+            for (int j = 0; j < n; j++) {
+                if ((i & (1 << j)) != 0) {
+                    totalWeight += details.get(j)[1];
+                    totalProfit += details.get(j)[2];
+                    if (!currentItem.isEmpty()) {
+                        currentItem.append(", ");
+                    }
+                    currentItem.append(details.get(j)[0]);
+
+                    System.out.println(details.get(j)[0]+ " ");
+                }
+            }
+            if (totalWeight <= k && totalProfit > maxProfit) {
+                maxProfit = totalProfit;
+                selectedItems = currentItem.toString();
+            }
+        }
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - StartTime;
+        JOptionPane.showMessageDialog(view, "Solusi diselesaikan dalam " + duration + " milliseconds", "Information", JOptionPane.INFORMATION_MESSAGE);
+
+        view.getHasilBarangField().setText(selectedItems);
     }
 
-    private void displayBarangNamesByProfit() {
-        List<float[]> details = getDataintolist();
-        details.sort(Comparator.comparingDouble(a -> ((float[])a)[2]).reversed());
-//        List<String> namabarang = new ArrayList<>();
-//        float constraint = getConstraintValue();
-//
-//        for (float[] detail : details) {
-//            if (constraint >= detail[1]) {
-//                DecimalFormat df = new DecimalFormat("#");
-//                namabarang.add(df.format(detail[0]));
-//                constraint -= detail[1];
-//            }
-//        }
-//        String hasilBarang =
-        String hasilBarang = greedyknapsack(details);
-        view.getHasilBarangField().setText(hasilBarang);
-    }
-
-    private void displayBarangNamesByDensity() {
-        List<float[]> details = getDataintolist();
-        details.sort(Comparator.comparingDouble(a -> ((float[])a)[3]).reversed());
-//        List<String> namabarang = new ArrayList<>();
-//        float constraint = getConstraintValue();
-//
-//        for (float[] detail : details) {
-//            if (constraint >= detail[1]) {
-//                DecimalFormat df = new DecimalFormat("#");
-//                namabarang.add(df.format(detail[0]));
-//                constraint -= detail[1];
-//            }
-//        }
-//        String hasilBarang = String.join(", ", namabarang);
-        String hasilBarang = greedyknapsack(details);
-        view.getHasilBarangField().setText(hasilBarang);
-    }
-
-    private void displayBarangByDynamicProgramming(){
-        List<float[]> details = getDataintolist();
+    private void displayBarangByDynamicProgramming() {
+        List<int[]> details = getDataintolistDP();
         int k = getConstraintValue();
         int n = details.size();
-        float [][] dp = new float[n+1][k+1];
-        boolean [][] keep = new boolean[n+1][k+1];
+        int [][] dp = new int[n+1][k+1];
 
-        int i = 1;
-        for (float[] detail : details){
-            float weight = detail[1];
-            float profit = detail[2];
-
-            for (int w = 0; w <= k; w++) {
-                if (weight <= w) {
-                    if (profit + dp[i - 1][(int)(w - weight)] > dp[i - 1][w]) {
-                        dp[i][w] = profit + dp[i - 1][(int)(w - weight)];
-                        keep[i][w] = true;
-                    } else {
-                        dp[i][w] = dp[i - 1][w];
-                        keep[i][w] = false;
-                    }
+        long StartTime = System.currentTimeMillis();
+        for (int i = 1; i <= n; i++){
+            for (int w = 1; w <= k; w++) {
+                if (details.get(i - 1)[1] <= w) {
+                    dp[i][w] = Math.max(details.get(i - 1)[2]+ dp[i - 1][w - details.get(i - 1)[1]], dp[i-1][w]);
                 } else {
                     dp[i][w] = dp[i - 1][w];
-                    keep[i][w] = false;
                 }
-            }
-            i++;
-        }
-
-        StringBuilder hasilBarang = new StringBuilder();
-        int w = k;
-        for (i = n; i > 0 && w > 0; i--) {
-            if (keep[i][w]) {
-                if (!hasilBarang.isEmpty()) {
-                    hasilBarang.append(", ");
-                }
-                hasilBarang.append((int) details.get(i - 1)[0]); // Add the item number as an integer
-                w -= (int) details.get(i - 1)[1]; // Reduce the weight
             }
         }
 
-        view.getHasilBarangField().setText(hasilBarang.toString());
+        StringBuilder selectedItems = new StringBuilder();
+        int i = n, w = k;
+        while (i > 0 && w > 0) {
+            if (dp[i][w] != dp[i - 1][w]) {
+                if (!selectedItems.isEmpty()) {
+                    selectedItems.insert(0, ", ");
+                }
+                selectedItems.insert(0, details.get(i - 1)[0]); // Assuming item[0] is the item number
+                w -= details.get(i - 1)[1];
+            }
+            i--;
+        }
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - StartTime;
+        JOptionPane.showMessageDialog(view, "Solusi diselesaikan dalam " + duration + " milliseconds", "Information", JOptionPane.INFORMATION_MESSAGE);
+
+        view.getHasilBarangField().setText(selectedItems.toString());
     }
+
+//    private void displayBarangNamesByDensity() {
+//        List<int[]> details = getDataintolistDP();
+//        int n = details.size();
+//        int k = getConstraintValue();
+//        int maxProfit = 0;
+//        String selectedItems = "";
+//
+//        for (int i = 0; i < (1 << n); i++) {
+//            int totalWeight = 0;
+//            int totalProfit = 0;
+//            StringBuilder currentItem = new StringBuilder();
+//
+//            System.out.print("Subset " + (i + 1) + ": ");
+//
+//            for (int j = 0; j < n; j++) {
+//                if ((i & (1 << j)) != 0) {
+//                    totalWeight += details.get(j)[1];
+//                    totalProfit += details.get(j)[2];
+//                    if (!currentItem.isEmpty()) {
+//                        currentItem.append(", ");
+//                    }
+//                    currentItem.append(details.get(j)[0]);
+//
+//                    System.out.println(details.get(j)[0]+ " ");
+//                }
+//            }
+//            if (totalWeight <= k && totalProfit > maxProfit) {
+//                maxProfit = totalProfit;
+//                selectedItems = currentItem.toString();
+//            }
+//        }
+//        view.getHasilBarangField().setText(selectedItems);
+//    }
+
+//    private void displayBarangByDynamicProgramming(){
+//        List<int[]> details = getDataintolistDP();
+//        int k = getConstraintValue();
+//        int n = details.size();
+//        int [][] dp = new int[n+1][k+1];
+//
+//        for (int i = 1; i <= n; i++){
+//            for (int w = 1; w <= k; w++) {
+//                if (details.get(i - 1)[1] <= w) {
+//                    dp[i][w] = Math.max(details.get(i - 1)[2]+ dp[i - 1][w - details.get(i - 1)[1]], dp[i-1][w]);
+//                } else {
+//                    dp[i][w] = dp[i - 1][w];
+//                }
+//            }
+//        }
+//
+//        StringBuilder selectedItems = new StringBuilder();
+//        int i = n, w = k;
+//        while (i > 0 && w > 0) {
+//            if (dp[i][w] != dp[i - 1][w]) {
+//                if (!selectedItems.isEmpty()) {
+//                    selectedItems.insert(0, ", ");
+//                }
+//                selectedItems.insert(0, details.get(i - 1)[0]); // Assuming item[0] is the item number
+//                w -= details.get(i - 1)[1];
+//            }
+//            i--;
+//        }
+//        view.getHasilBarangField().setText(selectedItems.toString());
+//    }
 }
 
