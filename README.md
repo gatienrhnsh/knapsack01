@@ -29,6 +29,6 @@ cd knapsack01
    **OR Via Terminal**
   ```bash
   cd knapsack01/src
-  javac src/main/Main.java 
-  java src/main/Main
+  javac main/Main.java 
+  java main/Main
   ```
