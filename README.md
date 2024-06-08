@@ -26,8 +26,9 @@ cd knapsack01
 
     In your IDE, locate the Main class (main/Main.java) and run it. This will launch the Knapsack 0/1 Solver application.
 
-   **OR**
+   **OR Via Terminal**
   ```bash
+  cd knapsack01/src
   javac src/main/Main.java 
   java src/main/Main
   ```
