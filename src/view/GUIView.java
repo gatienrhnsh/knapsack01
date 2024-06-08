@@ -14,8 +14,6 @@ public class GUIView extends JFrame {
     private final JTextField constraintField;
     private final JTextField hasilBarangField;
     private final JButton BruteForceButton;
-//    private final JButton byProfitButton;
-//    private final JButton byDensityButton;
     private final JButton DynamicProgrammingButton;
 
     public GUIView() {
@@ -56,12 +54,6 @@ public class GUIView extends JFrame {
 
         BruteForceButton = new JButton("Brute Force");
         buttonPanel.add(BruteForceButton);
-
-//        byProfitButton = new JButton("By Profit");
-//        buttonPanel.add(byProfitButton);
-//
-//        byDensityButton = new JButton("By Density");
-//        buttonPanel.add(byDensityButton);
 
         DynamicProgrammingButton = new JButton("Dynamic Programming");
         buttonPanel.add(DynamicProgrammingButton);
@@ -116,14 +108,6 @@ public class GUIView extends JFrame {
     public JButton getBruteForceButton() {
         return BruteForceButton;
     }
-
-//    public JButton getByProfitButton() {
-//        return byProfitButton;
-//    }
-//
-//    public JButton getByDensityButton() {
-//        return byDensityButton;
-//    }
 
     public JButton getDynamicProgrammingButton() {
         return DynamicProgrammingButton;

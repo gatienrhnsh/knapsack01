@@ -17,8 +17,6 @@ public class TableController {
         this.view.getAddButton().addActionListener(new AddButtonListener());
         this.view.getRemoveButton().addActionListener(new RemoveButtonListener());
         this.view.getBruteForceButton().addActionListener(new ByBruteForceListener());
-//        this.view.getByProfitButton().addActionListener(new ByProfitListener());
-//        this.view.getByDensityButton().addActionListener(new ByDensitytListener());
         this.view.getDynamicProgrammingButton().addActionListener(new ByDynamicProgramming());
     }
 
@@ -42,20 +40,6 @@ public class TableController {
             displayBarangByBruteForce();
         }
     }
-
-//    private class ByProfitListener implements ActionListener {
-//        @Override
-//        public void actionPerformed(ActionEvent e) {
-//            displayBarangNamesByProfit();
-//        }
-//    }
-
-//    private class ByDensitytListener implements ActionListener {
-//        @Override
-//        public void actionPerformed(ActionEvent e) {
-//            displayBarangNamesByDensity();
-//        }
-//    }
 
     private class ByDynamicProgramming implements ActionListener {
         @Override
@@ -91,27 +75,7 @@ public class TableController {
         return constraint;
     }
 
-//    private List<float[]> getDataintolist() {
-//        List<Object[]> inputData = getInputDataFromTable();
-//        List<float[]> details = new ArrayList<>();
-//        for (int i = 0; i < inputData.size(); i++) {
-//            Object[] row = inputData.get(i);
-//            if (row[1] != null && row[2] != null) {
-//                try {
-//                    float no = i + 1;
-//                    float weight = Float.parseFloat(row[1].toString());
-//                    float profit = Float.parseFloat(row[2].toString());
-//                    float density = profit / weight;
-//                    details.add(new float[]{no, weight, profit, density});
-//                } catch (NumberFormatException e) {
-//                    System.err.println("Invalid number in row: " + row[0]);
-//                }
-//            }
-//        }
-//        return details;
-//    }
-
-    private List<int[]> getDataintolistDP() {
+    private List<int[]> getDataintolist() {
         List<Object[]> inputData = getInputDataFromTable();
         List<int[]> details = new ArrayList<>();
         for (int i = 0; i < inputData.size(); i++) {
@@ -146,45 +110,27 @@ public class TableController {
         return data;
     }
 
-//    private String greedyknapsack(List<float[]> details){
-//        List<String> namabarang = new ArrayList<>();
-//        float constraint = getConstraintValue();
-//
-//        for (float[] detail : details) {
-//            if (constraint >= detail[1]){
-//                DecimalFormat df = new DecimalFormat("#");
-//                namabarang.add(df.format(detail[0]));
-//                constraint -= detail[1];
-//            }
-//        }
-//        return String.join(", ", namabarang);
-//    }
-
     private void displayBarangByBruteForce() {
-        List<int[]> details = getDataintolistDP();
+        long StartTime = System.currentTimeMillis();
+        List<int[]> details = getDataintolist();
         int n = details.size();
         int k = getConstraintValue();
         int maxProfit = 0;
         String selectedItems = "";
 
-        long StartTime = System.currentTimeMillis();
         for (int i = 0; i < (1 << n); i++) {
             int totalWeight = 0;
             int totalProfit = 0;
             StringBuilder currentItem = new StringBuilder();
 
-            System.out.print("Subset " + (i + 1) + ": ");
-
             for (int j = 0; j < n; j++) {
                 if ((i & (1 << j)) != 0) {
                     totalWeight += details.get(j)[1];
                     totalProfit += details.get(j)[2];
-                    if (!currentItem.isEmpty()) {
+                    if (currentItem.length() != 0) {
                         currentItem.append(", ");
                     }
                     currentItem.append(details.get(j)[0]);
-
-                    System.out.println(details.get(j)[0]+ " ");
                 }
             }
             if (totalWeight <= k && totalProfit > maxProfit) {
@@ -193,19 +139,20 @@ public class TableController {
             }
         }
         long endTime = System.currentTimeMillis();
-        long duration = endTime - StartTime;
-        JOptionPane.showMessageDialog(view, "Solusi diselesaikan dalam " + duration + " milliseconds", "Information", JOptionPane.INFORMATION_MESSAGE);
-
+        double duration = endTime - StartTime;
+        String durationString = String.format("%.10f", (double)duration/1024.0);
+        System.out.println(durationString);
         view.getHasilBarangField().setText(selectedItems);
+        JOptionPane.showMessageDialog(view, "Execution time: " + durationString + " second ");
     }
 
     private void displayBarangByDynamicProgramming() {
-        List<int[]> details = getDataintolistDP();
+        long StartTime = System.currentTimeMillis();
+        List<int[]> details = getDataintolist();
         int k = getConstraintValue();
         int n = details.size();
         int [][] dp = new int[n+1][k+1];
 
-        long StartTime = System.currentTimeMillis();
         for (int i = 1; i <= n; i++){
             for (int w = 1; w <= k; w++) {
                 if (details.get(i - 1)[1] <= w) {
@@ -220,7 +167,7 @@ public class TableController {
         int i = n, w = k;
         while (i > 0 && w > 0) {
             if (dp[i][w] != dp[i - 1][w]) {
-                if (!selectedItems.isEmpty()) {
+                if (selectedItems.length() != 0) {
                     selectedItems.insert(0, ", ");
                 }
                 selectedItems.insert(0, details.get(i - 1)[0]);
@@ -229,75 +176,12 @@ public class TableController {
             i--;
         }
         long endTime = System.currentTimeMillis();
-        long duration = endTime - StartTime;
-        JOptionPane.showMessageDialog(view, "Solusi diselesaikan dalam " + duration + " milliseconds", "Information", JOptionPane.INFORMATION_MESSAGE);
-
+        double duration = endTime - StartTime;
+        String durationString = String.format("%.10f", (double)duration/1024.0);
+        System.out.println(durationString);
         view.getHasilBarangField().setText(selectedItems.toString());
+        JOptionPane.showMessageDialog(view, "Execution time: " + durationString + " second ");
     }
 
-//    private void displayBarangNamesByDensity() {
-//        List<int[]> details = getDataintolistDP();
-//        int n = details.size();
-//        int k = getConstraintValue();
-//        int maxProfit = 0;
-//        String selectedItems = "";
-//
-//        for (int i = 0; i < (1 << n); i++) {
-//            int totalWeight = 0;
-//            int totalProfit = 0;
-//            StringBuilder currentItem = new StringBuilder();
-//
-//            System.out.print("Subset " + (i + 1) + ": ");
-//
-//            for (int j = 0; j < n; j++) {
-//                if ((i & (1 << j)) != 0) {
-//                    totalWeight += details.get(j)[1];
-//                    totalProfit += details.get(j)[2];
-//                    if (!currentItem.isEmpty()) {
-//                        currentItem.append(", ");
-//                    }
-//                    currentItem.append(details.get(j)[0]);
-//
-//                    System.out.println(details.get(j)[0]+ " ");
-//                }
-//            }
-//            if (totalWeight <= k && totalProfit > maxProfit) {
-//                maxProfit = totalProfit;
-//                selectedItems = currentItem.toString();
-//            }
-//        }
-//        view.getHasilBarangField().setText(selectedItems);
-//    }
-
-//    private void displayBarangByDynamicProgramming(){
-//        List<int[]> details = getDataintolistDP();
-//        int k = getConstraintValue();
-//        int n = details.size();
-//        int [][] dp = new int[n+1][k+1];
-//
-//        for (int i = 1; i <= n; i++){
-//            for (int w = 1; w <= k; w++) {
-//                if (details.get(i - 1)[1] <= w) {
-//                    dp[i][w] = Math.max(details.get(i - 1)[2]+ dp[i - 1][w - details.get(i - 1)[1]], dp[i-1][w]);
-//                } else {
-//                    dp[i][w] = dp[i - 1][w];
-//                }
-//            }
-//        }
-//
-//        StringBuilder selectedItems = new StringBuilder();
-//        int i = n, w = k;
-//        while (i > 0 && w > 0) {
-//            if (dp[i][w] != dp[i - 1][w]) {
-//                if (!selectedItems.isEmpty()) {
-//                    selectedItems.insert(0, ", ");
-//                }
-//                selectedItems.insert(0, details.get(i - 1)[0]); // Assuming item[0] is the item number
-//                w -= details.get(i - 1)[1];
-//            }
-//            i--;
-//        }
-//        view.getHasilBarangField().setText(selectedItems.toString());
-//    }
 }
 
