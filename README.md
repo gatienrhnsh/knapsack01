@@ -28,5 +28,6 @@ cd knapsack01
 
    **OR**
   ```bash
-  javac src/main/Main.java && java src/main/Main
+  javac src/main/Main.java 
+  java src/main/Main
   ```
